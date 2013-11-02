@@ -1,4 +1,4 @@
- # Growing Neural Gas Clusterer #
+# Growing Neural Gas Clusterer #
 
 **Note:** This project is for CS 591.003 "Data Mining" and CS 591.001 "Big data". This is not meant to be used for predictive purposes and any use of this project is at your own risk. There are no guarantees for the validity of any results used by this program.
 
