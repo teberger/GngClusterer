@@ -1,8 +1,7 @@
 import networkx as nx
 import random
-from functools import partial
 
-class gng(networkx):
+class gng(object):
     def __init__(self, error_fn, node_gen, learning_rate, age_max):
         self.node_generator = node_gen
         self.err_fn = error_fn
@@ -10,12 +9,13 @@ class gng(networkx):
         self.age_max = age_max
 
         #initialize the network to two points
-        rand_point_x = node_gen.generate(mode = "random")
-        rand_point_y = node_gen.generate(mode = "random")
+        rand_point_x = node_gen(mode = "random")
+        rand_point_y = node_gen(mode = "random")
         self.network = nx.Graph()
         self.network.add_node(rand_point_x)
         self.network.add_node(rand_point_y)
         self.network.add_edge(rand_point_x, rand_point_y)
+        self.network.
 
     def grow(self):
         #find node with highest error -- distance to closest node
@@ -28,9 +28,7 @@ class gng(networkx):
         self.network.remove_edge(err_node, err_neighbor)
 
         #insert new node
-        new_node = self.node_generator.generate(mode = "average",\
-                                                x = err_node,\
-                                                y = err_neighbor)
+        new_node = self.node_generator(mode = "average", x = err_node, y = err_neighbor)
         #update local error of the largest nodes
         self.network[err_node]['error'] = self.network[err_node] * (1-self.learning_rate)
         self.network[err_neighbor]['error'] = self.network[err_neighbor] * (1-self.learning_rate)
@@ -44,10 +42,7 @@ class gng(networkx):
     #stimulate graph using underlying data -- point param
     def fit(self, point):
         #search for nearest neighbors        
-        [(b0, b0_e),(b1, b1_e)] = self.error_fn(self.network.nodes(), \
-                                   mode="min", \
-                                   locality = point, \
-                                   size=2)
+        [(b0, b0_e),(b1, b1_e)] = self.error_fn(self.network.nodes(), mode="min", locality = point, size=2)
 
         #increment the age of the edges in the network
         increment_edge_ages(b0)
@@ -57,8 +52,6 @@ class gng(networkx):
         self.network[b1]['error'] = self.network[b1]['error'] + b1_e        
 
         #add the edge, will be ignored if it is already in the graph
-
-
         #set the edge age to be 0 if it didn't exist
         if not (b0, b1) in self.network.edges():
             self.network.add_edge(b0, b1)
@@ -66,12 +59,9 @@ class gng(networkx):
 
         #pull nodes in direction of stimulation
         for node in self.network.neighbors(b0):
-            new_node = self.node_generator.generate(mode = "average", \
-                                                    x = node, y = point, \
-                                                    x_weight = 1-self.learning_rate, \
-                                                    y_weight = self.learning_rate)
-
-            self.network.set_node_attributes(node, new_node.attributes)
+            new_node = self.node_generator(mode = "average", x = node, y = point, x_weight = 1-self.learning_rate, y_weight = self.learning_rate)
+            node.attributes = new_node.attributes
+ #           self.network.set_node_attributes(node, new_node.attributes)
 
         #decrease all node error
         decrease_error()
@@ -83,6 +73,7 @@ class gng(networkx):
                 self.network.remove_edge(n, t)
             if len(self.network.neighbors(n)) == 0:
                 self.network.remove_node(n)
+
 
     def decrease_error():
         for node in self.network.nodes_iter():
