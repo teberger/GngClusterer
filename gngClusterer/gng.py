@@ -15,7 +15,7 @@ class gng(object):
         self.network.add_node(rand_point_x)
         self.network.add_node(rand_point_y)
         self.network.add_edge(rand_point_x, rand_point_y)
-        self.network.
+        self.network[rand_point_x][rand_point_y]['age'] = 0
 
     def grow(self):
         #find node with highest error -- distance to closest node
@@ -36,12 +36,13 @@ class gng(object):
         #connect to other two nodes with highest error
         self.network.add_node(new_node, error = (err + err_n)/2.0)
         self.network.add_edge(err_node, new_node)
+        self.network[err_node][new_node]['age'] = 0
         self.network.add_edge(err_neighbor, new_node)
-        
+        self.network[err_neighbor][new_node]['age'] = 0
 
     #stimulate graph using underlying data -- point param
     def fit(self, point):
-        #search for nearest neighbors        
+        #search for nearest neighbors
         [(b0, b0_e),(b1, b1_e)] = self.error_fn(self.network.nodes(), mode="min", locality = point, size=2)
 
         #increment the age of the edges in the network
@@ -49,7 +50,7 @@ class gng(object):
 
         #update errors of the two nodes
         self.network[b0]['error'] = self.network[b0]['error'] + b0_e
-        self.network[b1]['error'] = self.network[b1]['error'] + b1_e        
+        self.network[b1]['error'] = self.network[b1]['error'] + b1_e
 
         #add the edge, will be ignored if it is already in the graph
         #set the edge age to be 0 if it didn't exist
