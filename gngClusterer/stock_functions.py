@@ -5,6 +5,7 @@ from random import *
 '''
 number_of_cross_sections = 7
 stats_keys = ['trend', 'norm_trend_mag', 'volatility']
+#Sets up the normalized cross sectionals of the data
 for i in xrange(number_of_cross_sections):
     stats_keys.append('norm_cross_' + str("%03d") % i)
 
@@ -25,13 +26,13 @@ def generate(mode, x, y, x_weight = 0.5, y_weight = 0.5):
 def random_node():
     attr = {}
     attr['trend'] = randint(0,2) - 1
-    #positive value, coud be any range including infinity...
+    #positive value, coud be any range including infinity... This may be trouble...
     attr['volatility'] = randuniform(0, 100)
     for key in stats_keys:
         if key == 'trend' or key == 'volatility':
             continue
         #95% of the data should fall between here
-        #so this should be a reasonabl range to generate
+        #so this should be a reasonable range to generate
         #from
         attr[key] = randuniform(-2,-2) 
 
@@ -52,15 +53,13 @@ def average(x, y, x_weight, y_weight):
     return node(attr)
 
 
-'''
-    Testing functionality
-'''
-if __name__ == '__main__':
-    for i in xrange(100):
-        print randint(0,2)-1
+##Error function
+def error():
+    pass
 
 #leaving this out for now, might not need it
 #id_val_counter = 0
+
 class node(object):
     def __init__(self, dictionary):
         for key in stats_keys:
