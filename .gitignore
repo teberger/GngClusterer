@@ -1,5 +1,7 @@
 networkx_doc_examples
 networkx/release.pyc
 networkx/version.pyc
+networkx/networkx/*
+networkx/build/*
 data
 *.*~

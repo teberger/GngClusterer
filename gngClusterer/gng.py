@@ -17,12 +17,14 @@ class gng(object):
         self.network.add_edge(rand_point_x, rand_point_y)
         self.network[rand_point_x][rand_point_y]['age'] = 0
 
-    def grow(self):
-        #find node with highest error -- distance to closest node
-        (err_node, err) = self.error_fn(self.network.nodes(), mode="max")
+    def grow(self): 
+        #get the node with the highest error
+        err_node = sorted(self.network.get_nodes(), lambda x: self.network.get_node_attributes(x, 'error'))[0]
+        err = self.network.get_node_attributes(err_node, 'error')
 
-        #find connected node with highest error
-        (err_neighbor, err_n) = self.error_fn(self.network.neighbors(err_node), mode="max")
+        #get its neighboring node with the highest error
+        err_neighbor = sorted(self.network.get_neighbors(err_node), lambda x: self.network.get_node_attributes(x, 'error'))[0]
+        err_n = self.network.get_node_attributes(err_neighbor, 'error')
 
         #delete edge between the two
         self.network.remove_edge(err_node, err_neighbor)
@@ -43,7 +45,7 @@ class gng(object):
     #stimulate graph using underlying data -- point param
     def fit(self, point):
         #search for nearest neighbors
-        [(b0, b0_e),(b1, b1_e)] = self.error_fn(self.network.nodes(), mode="min", locality = point, size=2)
+        [(b0, b0_e),(b1, b1_e)] = self.error_fn(self.network.nodes(), locality = point, size=2)
 
         #increment the age of the edges in the network
         increment_edge_ages(b0)
@@ -60,9 +62,13 @@ class gng(object):
 
         #pull nodes in direction of stimulation
         for node in self.network.neighbors(b0):
-            new_node = self.node_generator(mode = "average", x = node, y = point, x_weight = 1-self.learning_rate, y_weight = self.learning_rate)
+            new_node = self.node_generator(mode = "average",
+                                           x = node,
+                                           y = point, 
+                                           x_weight = 1-self.learning_rate,
+                                           y_weight = self.learning_rate)
+            #replace node attributes with the averaged attributes
             node.attributes = new_node.attributes
- #           self.network.set_node_attributes(node, new_node.attributes)
 
         #decrease all node error
         decrease_error()

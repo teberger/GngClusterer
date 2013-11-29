@@ -1,4 +1,5 @@
 from random import *
+from numpy import sqrt
 
 '''
     setup the dictionary keys for the stats object
@@ -41,9 +42,9 @@ def random_node():
 def average(x, y, x_weight, y_weight):
     attr = {}
     if x_weight < y_weight:
-        attr['trend'] = y_weight
+        attr['trend'] = y.attributes['trend']
     else:
-        attr['trend'] = x_weight
+        attr['trend'] = x.attributes['trend']
 
     for key in stats_keys:
         if key == 'trend':
@@ -54,8 +55,29 @@ def average(x, y, x_weight, y_weight):
 
 
 ##Error function
-def error():
-    pass
+''' 
+    return a sorted list of tuples [(node, error of the node)]
+    by the error of the node. 
+'''
+def lp_distance(nodes, x, size = 1, p = 2):
+    ret = []
+    for i in nodes:
+        error = sqrt(sum([(i.attributes[att] - x.attributes[att])**p
+                          for att in x.attributes if att != 'trend']))
+        #handle trend differently, since it is a determining factor
+        #in similarity, it operates on the entire error and magnifies
+        #it if the two stock are not following the same trend
+        if x.attributes['trend'] != i.attributes['trent']:
+            if abs(x.attributes['trend'] - i.attributes['trend']) > 1:
+                error = error * 1.5
+            else:
+                error = error * 1.25
+            
+        ret + (i, error)
+
+    #slice the data according to the size of the list we need
+    return ret.sort(lambda tup: tup[2])[0:size]
+        
 
 #leaving this out for now, might not need it
 #id_val_counter = 0
