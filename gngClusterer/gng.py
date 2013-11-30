@@ -19,11 +19,15 @@ class gng(object):
 
     def grow(self): 
         #get the node with the highest error
-        err_node = sorted(self.network.get_nodes(), lambda x: self.network.get_node_attributes(x, 'error'))[0]
+        err_node = sorted(self.network.get_nodes(),
+                          lambda x: self.network.get_node_attributes(x, 'error')
+                         )[0]
         err = self.network.get_node_attributes(err_node, 'error')
 
         #get its neighboring node with the highest error
-        err_neighbor = sorted(self.network.get_neighbors(err_node), lambda x: self.network.get_node_attributes(x, 'error'))[0]
+        err_neighbor = sorted(self.network.get_neighbors(err_node), 
+                              lambda x: self.network.get_node_attributes(x, 'error')
+                             )[0]
         err_n = self.network.get_node_attributes(err_neighbor, 'error')
 
         #delete edge between the two

@@ -4,7 +4,7 @@ import time
 #when the next date is valid. 
 
 class stock_data_generator(object):
-    file_loc = "./finance/"
+    file_loc = "../data/"
     def __init__(self, stock_name, initial_day, window_size):
         self.stock_name = stock_name
         self.curr_day = time.strptime("%Y-%m-%d", initial_day)

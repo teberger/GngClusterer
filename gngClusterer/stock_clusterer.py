@@ -1,6 +1,13 @@
+import glob
 import gng
 import stock_functions
 
 if __name__ == '__main__':
-    graph = gng.gng()
+    files = glob.glob("../data/*.csv")
+    print files
+    print open(files[0]).read()
+    
+#    graph = gng.gng()
+
+
 
