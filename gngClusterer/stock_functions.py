@@ -91,3 +91,4 @@ class node(object):
 #        self.id_val = id_val_counter + 1
 #        id_val_counter = self.id_val
         self.attributes = dictionary
+        self.assigned_nodes = []

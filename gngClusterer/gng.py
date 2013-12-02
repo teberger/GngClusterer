@@ -51,6 +51,9 @@ class gng(object):
         #search for nearest neighbors
         [(b0, b0_e),(b1, b1_e)] = self.error_fn(self.network.nodes(), locality = point, size=2)
 
+        #assign the point to a node in the GNG
+        b0.assigned_nodes.append(point)
+
         #increment the age of the edges in the network
         increment_edge_ages(b0)
 
@@ -60,7 +63,7 @@ class gng(object):
 
         #add the edge, will be ignored if it is already in the graph
         #set the edge age to be 0 if it didn't exist
-        if not (b0, b1) in self.network.edges():
+        if (b0, b1) not in self.network.edges():
             self.network.add_edge(b0, b1)
             self.network[b0][b1]['age'] = 0
 

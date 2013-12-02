@@ -10,7 +10,7 @@ class stock_data_generator(object):
         self.curr_day = time.strptime("%Y-%m-%d", initial_day)
         self.n = window_size
         raw = open('./data/' + stock_name + '.csv', 'r')
-        lines = raw.read().splitlines()
+        lines = raw.read()
         self.min_day = time.strptime("%Y-%m-%d", lines[0].split(',')[0])
         self.max_day = time.strptime("%Y-%m-%d", lines[len(lines)-1].split(',')[0])
 
@@ -19,11 +19,7 @@ class stock_data_generator(object):
             [key,val] = l.split(',', 1)
             self.data[key] = val
         
-
-    #Python 3 compatibility
-    def __next__():
-        return next()
-
+    #!TODO: rewrite
     def next():
         # day deltas
         d1 = timedelta(days=1)
