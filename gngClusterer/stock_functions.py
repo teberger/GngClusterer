@@ -1,14 +1,7 @@
 from random import *
 from numpy import sqrt
+import constants
 
-'''
-    setup the dictionary keys for the stats object
-'''
-number_of_cross_sections = 7
-stats_keys = ['trend', 'norm_trend_mag', 'volatility']
-#Sets up the normalized cross sectionals of the data
-for i in xrange(number_of_cross_sections):
-    stats_keys.append('norm_cross_' + str("%03d") % i)
 
 '''
     Defining the generating function as a modular function
@@ -29,7 +22,7 @@ def random_node():
     attr['trend'] = randint(0,2) - 1
     #positive value, coud be any range including infinity... This may be trouble...
     attr['volatility'] = randuniform(0, 100)
-    for key in stats_keys:
+    for key in constants.stats_keys:
         if key == 'trend' or key == 'volatility':
             continue
         #95% of the data should fall between here
@@ -46,7 +39,7 @@ def average(x, y, x_weight, y_weight):
     else:
         attr['trend'] = x.attributes['trend']
 
-    for key in stats_keys:
+    for key in constants.stats_keys:
         if key == 'trend':
             continue
         attr[key] = x.attributes[key] * x_weight + y.attributes[key] * y_weight
@@ -84,7 +77,7 @@ def lp_distance(nodes, x, size = 1, p = 2):
 
 class node(object):
     def __init__(self, dictionary):
-        for key in stats_keys:
+        for key in constants.stats_keys:
             if not key in dictionary:
                 raise ValueError(key)
 # See above

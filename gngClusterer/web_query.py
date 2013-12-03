@@ -2,9 +2,6 @@ import urllib2 as url_query
 
 
 class finviz_query(object):
-    '''
-       TODO: Class documentation
-    '''
     page = "http://finviz.com/export.ashx?v=111&t="
 
     def __init__(self, symbol):
