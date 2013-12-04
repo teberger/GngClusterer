@@ -13,14 +13,19 @@ class stock_data_generator(object):
         self.curr_day = time.strptime(initial_day, "%Y-%m-%d")
         self.n = window_size
         raw = open(stock_name, 'r')
-        lines = raw.read().readlines()
+        lines = raw.read().splitlines()
         self.min_day = time.strptime(lines[1].split(',')[0], "%Y-%m-%d")
         self.max_day = time.strptime(lines[len(lines)-1].split(',')[0], "%Y-%m-%d")
 
+        print 'Constructing generator for: ', self.stock_name
+        print '\tParsing data...'
         self.data = {}
         for l in lines:
+            if l == lines[0]:
+                continue
             [key,val] = l.split(',', 1)
-            data[key] = dict(zip(header_items.split(','), map(lambda x: float(x), val.split(','))))
+            self.data[key] = dict(zip(header_items.split(','), map(lambda x: float(x), val.split(','))))
+        print 'Done...'
         
     def generate():
         # day deltas
