@@ -3,8 +3,8 @@
 win_size = 30 #One month window size
 
 learning_rate = 0.1
-age_max = 201
-epoch_lambda = 100
+age_max = 500
+epoch_lambda = 50
 
 target_init_iterations = 40000
 

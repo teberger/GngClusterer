@@ -2,13 +2,15 @@ import glob
 import gng
 import stock_functions
 import file_query
-import time
+from datetime import datetime, timedelta
 import constants
 import sys
+import networkx
+from sets import Set
 
 if __name__ == '__main__':
     output_file = open(sys.argv[1], 'w')
-    stocks = glob.glob("../data/*.csv")
+    stocks = glob.glob("../test_data/*.csv")
     print 'reading stocks... This may take some time...'
     generators = []
     for stock in stocks:
@@ -17,10 +19,11 @@ if __name__ == '__main__':
                                                      window_size = constants.win_size))
     print 'Complete.'
 
-    day = time.strptime( "1996-04-12", "%Y-%m-%d")
-    max_day =time.strptime("2013-7-30", "%Y-%m-%d")
+    day = datetime.strptime("1996-04-12", "%Y-%m-%d")
+    max_day = datetime.strptime("2013-7-30", "%Y-%m-%d")
 
     d1 = timedelta(days=1)
+    dn = timedelta(days=constants.win_size)
 
     print 'Constructing GNG intial network...'
     #construct GNG_NET
@@ -35,26 +38,37 @@ if __name__ == '__main__':
 
     print 'Complete...'
     print 'Generating initial vectors'
-
-    initial_vectors = map(lambda x: x.generate(), generators)
+    
     #initial iterationation to semi-fit the data
     print "Initial fit:"
     for i in xrange(init_iterations):
-        print "\tIteration ", str(i)
-        for vector in initial_vectors:
-
+        print "\tIteration ", str(iteration), 'Day: ', day.strftime('%Y-%m-%d')
+        for g in generators:
+            vector = g.generate(day, day + dn)
             #if we don't have sufficient data, ignore the point for this iteration
-            if len(vector) < constants.win_size:
+            if len(vector) < constants.num_cross_sections:
                 continue
-            stock = stock_functions.generate_stats(vector) #TODO
+            stock = stock_functions.generate_stats(vector, day)
+            if len(stock) != len(constants.stats_keys):
+                continue
 
-            gng_net.fit(stock)
+            gng_net.fit(stock, g.stock_name)
 
             iteration = iteration + 1
             if iteration % epoch_lambda == 0:
+                print 'Growing...'
                 gng_net.grow()
-
+        day = day + d1
+    
     print "Initial fit ended. Beginning clustering..."
+
+    #reset the day
+    day = datetime.strptime("1996-04-12", "%Y-%m-%d")
+
+    #reset assigned node sets
+    for i in gng_net.network.nodes():
+        i.assigned_signals.clear()
+
     # reset iterationation count
     iteration = 0
 
@@ -63,27 +77,36 @@ if __name__ == '__main__':
         #iterationate until day == max_day, letting the GNG_NET
         #fit for up to 40000 generations before starting 
         #the iterationation.
-        for stock in generators:
-            vector = stock_functions.generate_stats(stock.generate())
-            if len(vector) < constants.win_size:
+        for g in generators:
+            #if we don't have sufficient data, ignore the point for this iteration
+            vector = g.generate(day, day + dn)
+            if len(vector) < constants.num_cross_sections:
                 continue
-            iteration = iteration + 1
-            gng_net.fit(vector)
+            stock = stock_functions.generate_stats(vector, day)
+            if len(stock) != len(constants.stats_keys):
+                continue
 
+            gng_net.fit(stock, g.stock_name)
+
+            iteration = iteration + 1
             if iteration % epoch_lambda == 0:
+                print 'Growing...'
+                print '\tNodes:', str(len(gng_net.network.nodes()))
+                print '\tComponents:', str(len(networkx.connected_components(gng_net.network)))
                 gng_net.grow()
 
         #on each iterationation BFS to find the forests in the
         #GNG_NET, output to file the stocks that are grouped 
         #together
         components = networkx.connected_components(gng_net.network)
-        output = ''
+        output = day.strftime('%Y-%m-%d') + ','
         for c in components:
             output = output + '['
             for node in c:
                 for v in node.assigned_signals:
                     output = output + str(v) + ','
-            output = output + ','
+                node.assigned_signals.clear()
+            output = output + '],'
 
         output_file.write(output + '\n')
 
