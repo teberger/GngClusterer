@@ -1,23 +1,26 @@
 import time
 
+header_items = 'Open,High,Low,Close,Volume,Adj Close'
+
+
 #generator that slices on the start day, and only generates a new window
 #when the next date is valid. 
-
 class stock_data_generator(object):
+
     def __init__(self, stock_name, initial_day, window_size):
         self.stock_name = stock_name[0 : len(stock_name) - len('.csv')]
         self.stock_name = self.stock_name[self.stock_name.rfind('/') + 1:]
-        self.curr_day = time.strptime("%Y-%m-%d", initial_day)
+        self.curr_day = time.strptime(initial_day, "%Y-%m-%d")
         self.n = window_size
         raw = open(stock_name, 'r')
-        lines = raw.read()
-        self.min_day = time.strptime("%Y-%m-%d", lines[0].split(',')[0])
-        self.max_day = time.strptime("%Y-%m-%d", lines[len(lines)-1].split(',')[0])
+        lines = raw.read().readlines()
+        self.min_day = time.strptime(lines[1].split(',')[0], "%Y-%m-%d")
+        self.max_day = time.strptime(lines[len(lines)-1].split(',')[0], "%Y-%m-%d")
 
         self.data = {}
         for l in lines:
             [key,val] = l.split(',', 1)
-            self.data[key] = val
+            data[key] = dict(zip(header_items.split(','), map(lambda x: float(x), val.split(','))))
         
     def generate():
         # day deltas

@@ -16,5 +16,5 @@ num_cross_sections = 7
 stats_keys = ['trend', 'norm_trend_mag', 'volatility']
 
 #Sets up the normalized cross sectionals of the data
-for i in xrange(number_of_cross_sections):
+for i in xrange(num_cross_sections):
     stats_keys.append('norm_cross_' + str("%03d") % i)

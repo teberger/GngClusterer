@@ -1,19 +1,23 @@
 import glob
 import gng
 import stock_functions
+import file_query
 import time
 import constants
+import sys
 
 if __name__ == '__main__':
+    output_file = open(sys.argv[1], 'w')
     stocks = glob.glob("../data/*.csv")
+
     generators = []
     for stock in stocks:
         generators + file_query.stock_data_generator(stock_name = stock,
                                                      initial_day = "1996-04-12",
                                                      window_size = constants.win_size)
 
-    day = time.strptime("%Y-%m-%d", "1996-04-12")
-    max_day =time.strptime("%Y-%m-%d", "2013-7-30")
+    day = time.strptime( "1996-04-12", "%Y-%m-%d")
+    max_day =time.strptime("2013-7-30", "%Y-%m-%d")
 
     d1 = timedelta(days=1)
 
@@ -35,7 +39,7 @@ if __name__ == '__main__':
             #if we don't have sufficient data, ignore the point for this iteration
             if len(vector) < constants.win_size:
                 continue
-            stock = None #TODO
+            stock = stock_functions.generate_stats(vector) #TODO
 
             gng_net.fit(stock)
 
@@ -51,7 +55,7 @@ if __name__ == '__main__':
         #fit for up to 40000 generations before starting 
         #the iterationation.
         for stock in generators:
-            vector = stock.generate()
+            vector = stock_functions.generate_stats(stock.generate())
             if len(vector) < constants.win_size:
                 continue
             iteration = iteration + 1
@@ -64,6 +68,16 @@ if __name__ == '__main__':
         #on each iterationation BFS to find the forests in the
         #GNG_NET, output to file the stocks that are grouped 
         #together
+        components = networkx.connected_components(gng_net.network)
+        output = ''
+        for c in components:
+            output = output + '['
+            for node in c:
+                for v in node.assigned_signals:
+                    output = output + str(v) + ','
+            output = output + ','
+
+        output_file.write(output + '\n')
 
         #reset node assignments in GNG_NET
         day = d1 + day

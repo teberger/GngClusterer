@@ -52,7 +52,7 @@ class gng(object):
         [(b0, b0_e),(b1, b1_e)] = self.error_fn(self.network.nodes(), locality = point, size=2)
 
         #assign the point to a node in the GNG
-        b0.assigned_nodes.append(point)
+        b0.assigned_signals.append(point)
 
         #increment the age of the edges in the network
         increment_edge_ages(b0)

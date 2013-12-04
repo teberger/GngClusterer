@@ -1,5 +1,5 @@
 from random import *
-from numpy import sqrt
+from numpy import sqrt, ceil
 import constants
 
 
@@ -70,7 +70,50 @@ def lp_distance(nodes, x, size = 1, p = 2):
 
     #slice the data according to the size of the list we need
     return ret.sort(lambda tup: tup[2])[0:size]
-        
+
+
+def generate_stats(day_window, current_day):
+    stats = {}
+
+    min_day = max_day = current_day
+    x_bar = 0
+    for key in day_window:
+        if min_day > key:
+            min_day = key
+        if max_day < key:
+            max_day = key
+
+        x_bar = x_bar + day_window['key']['open'] + day_window['key']['close']
+
+    x_bar = x_bar / float(len(day_window)*2)
+    
+    var = 0
+    for key in day_window:
+        var = var + (day_window['key']['open'] - x_bar)**2
+        var = var + (day_window['key']['close'] - x_bar)**2
+    std_dev = sqrt(var)
+    try:
+        stats['trend'] = round(day_window[min_day]['open'] - day_window[max_day]['close']) / abs(day_window[min_day]['open'] - day_window[max_day]['close'])
+    except ZeroDivisionError:
+        stats['trend'] = 0
+
+    stats['norm_trend_mag'] = (day_window[min_day]['open'] - x_bar)/std_dev - (day_window[max_day]['close'] - x_bar)/std_dev
+
+    stats['volatility'] = var / x_bar
+
+
+    num_days = ceil(len(day_window) / float(constants.num_cross_sections))
+    days = sorted(day_window)
+    for i in xrange(constants.num_cross_sections):
+        sliced = days[i*num_days : (i+1)*num_days]
+        avg = 0
+        for d in sliced:
+            avg = avg + day_window[d]['open']
+            avg = avg + day_window[d]['close']
+        avg  = avg / float(len(sliced)*2)
+        stats[constants.stats_keys[3 + i]] = (avg - x_bar)/std_dev
+
+    return stats
 
 #leaving this out for now, might not need it
 #id_val_counter = 0
@@ -84,4 +127,4 @@ class node(object):
 #        self.id_val = id_val_counter + 1
 #        id_val_counter = self.id_val
         self.attributes = dictionary
-        self.assigned_nodes = []
+        self.assigned_signals = []
