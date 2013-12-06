@@ -10,7 +10,7 @@ from sets import Set
 
 if __name__ == '__main__':
     output_file = open(sys.argv[1], 'w')
-    stocks = glob.glob("../test_data/*.csv")
+    stocks = glob.glob("../data/*.csv")
     print 'reading stocks... This may take some time...'
     generators = []
     for stock in stocks:
@@ -58,7 +58,6 @@ if __name__ == '__main__':
 
             iteration = iteration + 1
             if iteration % epoch_lambda == 0:
-                print 'Growing...'
                 gng_net.grow()
         day = day + d1
     
@@ -78,7 +77,8 @@ if __name__ == '__main__':
     iteration = 0
 
     while day < max_day:
-        print "Starting ", day.strftime("%Y-%m-%d")
+        if day.day == 1:
+            print "Starting ", day.strftime("%Y-%m-%d")
         #iterationate until day == max_day, letting the GNG_NET
         #fit for up to 40000 generations before starting 
         #the iterationation.
@@ -88,7 +88,9 @@ if __name__ == '__main__':
 
             if len(vector) < constants.num_cross_sections:
                 continue
+
             stock = stock_functions.generate_stats(vector, day)
+
             if len(stock) != len(constants.stats_keys):
                 continue
 

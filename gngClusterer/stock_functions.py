@@ -86,7 +86,7 @@ def generate_stats(day_window, current_day):
             min_day = key
         if max_day < key:
             max_day = key
-        print day_window[key]
+
         x_bar.append(day_window[key]['Open'])
         x_bar.append(day_window[key]['Close'])
 
