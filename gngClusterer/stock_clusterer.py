@@ -14,8 +14,10 @@ if __name__ == '__main__':
     print 'reading stocks... This may take some time...'
     generators = []
     for stock in stocks:
+        print str(len(generators))
         generators.append(file_query.stock_data_generator(stock_name = stock,
                                                      initial_day = "1996-04-12",
+                                                     end_day = "2013-7-30",
                                                      window_size = constants.win_size))
     print 'Complete.'
 
@@ -44,7 +46,7 @@ if __name__ == '__main__':
     for i in xrange(init_iterations):
         print "\tIteration ", str(iteration), 'Day: ', day.strftime('%Y-%m-%d')
         for g in generators:
-            vector = g.generate(day, day + dn)
+            vector = g.generate()
             #if we don't have sufficient data, ignore the point for this iteration
             if len(vector) < constants.num_cross_sections:
                 continue
@@ -69,6 +71,9 @@ if __name__ == '__main__':
     for i in gng_net.network.nodes():
         i.assigned_signals.clear()
 
+    for i in generators:
+        i.reset()
+
     # reset iterationation count
     iteration = 0
 
@@ -79,7 +84,8 @@ if __name__ == '__main__':
         #the iterationation.
         for g in generators:
             #if we don't have sufficient data, ignore the point for this iteration
-            vector = g.generate(day, day + dn)
+            vector = g.generate()
+
             if len(vector) < constants.num_cross_sections:
                 continue
             stock = stock_functions.generate_stats(vector, day)
