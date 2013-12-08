@@ -47,8 +47,8 @@ class gng(object):
         #insert new node
         new_node = self.node_generator(mode = "average", x = err_node.attributes, y = err_neighbor.attributes)
         #update local error of the largest nodes
-        err_node.error = err_node.error * (1-self.learning_rate)
-        err_neighbor.error = err_neighbor.error * (1-self.learning_rate)
+        err_node.error = err_node.error * self.learning_rate
+        err_neighbor.error = err_neighbor.error * self.learning_rate
         new_node.error = (err + err_n)/2.0
 
         #connect to other two nodes with highest error
@@ -107,6 +107,6 @@ class gng(object):
 
     def decrease_error(self):
         for node in self.network.nodes_iter():
-            err = node.error * (1 - self.learning_rate)
+            err = node.error * self.learning_rate
             node.error = err
 

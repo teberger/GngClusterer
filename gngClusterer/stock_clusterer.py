@@ -9,6 +9,8 @@ import networkx
 from sets import Set
 
 if __name__ == '__main__':
+
+    
     output_file = open(sys.argv[1], 'w')
     stocks = glob.glob("../data/*.csv")
     print 'reading stocks... This may take some time...'
@@ -24,8 +26,7 @@ if __name__ == '__main__':
     day = datetime.strptime("1996-04-12", "%Y-%m-%d")
     max_day = datetime.strptime("2013-7-30", "%Y-%m-%d")
 
-    d1 = timedelta(days=1)
-    dn = timedelta(days=constants.win_size)
+    d1 = timedelta(days=7)
 
     print 'Constructing GNG intial network...'
     #construct GNG_NET
@@ -44,20 +45,19 @@ if __name__ == '__main__':
     #initial iterationation to semi-fit the data
     print "Initial fit:"
     for i in xrange(init_iterations):
-        print "\tIteration ", str(iteration), 'Day: ', day.strftime('%Y-%m-%d')
+        print "\tIteration ", str(i), 'Day: ', day.strftime('%Y-%m-%d')
         for g in generators:
             vector = g.generate()
             #if we don't have sufficient data, ignore the point for this iteration
             if len(vector) < constants.num_cross_sections:
                 continue
-            stock = stock_functions.generate_stats(vector, day)
+            stock = stock_functions.generate_trend_stats(vector, day)
             if len(stock) != len(constants.stats_keys):
                 continue
 
             gng_net.fit(stock, g.stock_name)
-
-            iteration = iteration + 1
-            if iteration % epoch_lambda == 0:
+            
+            if i % epoch_lambda == 0:
                 gng_net.grow()
         day = day + d1
     
@@ -76,12 +76,10 @@ if __name__ == '__main__':
     # reset iterationation count
     iteration = 0
 
+    #iterate until day >= max_day
     while day < max_day:
-        if day.day == 1:
-            print "Starting ", day.strftime("%Y-%m-%d")
-        #iterationate until day == max_day, letting the GNG_NET
-        #fit for up to 40000 generations before starting 
-        #the iterationation.
+        print "Starting ", day.strftime("%Y-%m-%d")
+
         for g in generators:
             #if we don't have sufficient data, ignore the point for this iteration
             vector = g.generate()
@@ -89,7 +87,7 @@ if __name__ == '__main__':
             if len(vector) < constants.num_cross_sections:
                 continue
 
-            stock = stock_functions.generate_stats(vector, day)
+            stock = stock_functions.generate_trend_stats(vector, day)
 
             if len(stock) != len(constants.stats_keys):
                 continue

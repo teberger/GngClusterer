@@ -61,16 +61,34 @@ def lp_distance(nodes, x, size = 1, p = 2):
         #handle trend differently, since it is a determining factor
         #in similarity, it operates on the entire error and magnifies
         #it if the two stock are not following the same trend
+        '''
         if x['trend'] != i.attributes['trend']:
             if abs(x['trend'] - i.attributes['trend']) > 1:
                 error = error * 1.5
             else:
                 error = error * 1.25
-            
+        '''    
         ret.append((i, error))
 
     #slice the data according to the size of the list we need
     return sorted(ret, lambda x,y: cmp(x[1],y[1]))[0:size]
+
+def generate_trend_stats(day_window, current_day):
+    stats = {}
+    if len(day_window) < constants.num_cross_sections:
+        return stats
+
+    num_days = int(ceil(len(day_window) / float(constants.num_cross_sections)))
+    days = sorted(day_window)
+    for i in xrange(constants.num_cross_sections):
+        sliced = days[i*num_days : (i+1)*num_days]
+        if (len(sliced) == 0):
+            continue 
+
+        trend = cmp(day_window[sliced[0]]['Open'], day_window[sliced[len(sliced)-1]]['Close'])
+        stats[constants.stats_keys[i]] = trend
+
+    return stats
 
 
 def generate_stats(day_window, current_day):
@@ -101,12 +119,12 @@ def generate_stats(day_window, current_day):
     stats['trend'] = cmp(day_window[min_day]['Open'] - day_window[max_day]['Close'], 0)
 
     stats['norm_trend_mag'] = (day_window[min_day]['Open'] - x_bar)/std_dev - (day_window[max_day]['Close'] - x_bar)/std_dev
-
+    
     if x_bar != 0:
         stats['volatility'] = var / x_bar
     else: 
         stats['volatility'] = -1
-
+    
 
     num_days = int(ceil(len(day_window) / float(constants.num_cross_sections)))
     days = sorted(day_window)
