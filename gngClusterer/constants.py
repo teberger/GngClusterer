@@ -1,19 +1,19 @@
 
 
-win_size = 90 #three month window size
+win_size = 30 #three month window size
 
 learning_rate = 0.1
-age_max = 200
-epoch_lambda = 50
+age_max = 50
+epoch_lambda = 25
 
-target_init_iterations = 40000
+target_init_iterations = 20000
 
 
 '''
     setup the dictionary keys for the stats object
 '''
-num_cross_sections = 7
-stats_keys = ['trend', 'norm_trend_mag', 'volatility']
+num_cross_sections = 4
+stats_keys = []
 
 #Sets up the normalized cross sectionals of the data
 for i in xrange(num_cross_sections):

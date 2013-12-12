@@ -5,5 +5,7 @@ networkx/networkx/*
 networkx/build/*
 data
 *.*~
+*.csv
+*.csv.seq
 *.pyc
 preprocessing/test.csv
